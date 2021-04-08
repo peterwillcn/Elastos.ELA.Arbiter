@@ -2,6 +2,8 @@ module github.com/elastos/Elastos.ELA.Arbiter
 
 go 1.13
 
+replace github.com/elastos/Elastos.ELA => /opt/elastos/Elastos.ELA
+
 require (
 	github.com/elastos/Elastos.ELA v0.6.1-0.20210318064042-95ab3962ee6e
 	github.com/elastos/Elastos.ELA.SPV v0.0.6-0.20201116073854-1b999e20b3f7
