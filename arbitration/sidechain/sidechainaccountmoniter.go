@@ -77,8 +77,9 @@ func (monitor *SideChainAccountMonitorImpl) fireIllegalEvidenceFound(evidence *p
 
 func (monitor *SideChainAccountMonitorImpl) SyncChainData(sideNode *config.SideNodeConfig, curr arbitrator.SideChain) {
 	for {
+		log.Info("side chain SyncChainData ," , sideNode.SupportQuickRecharge , sideNode.Rpc.IpAddress, sideNode.Rpc.HttpJsonPort)
 		chainHeight, currentHeight, needSync := monitor.needSyncBlocks(sideNode.GenesisBlockAddress, sideNode.Rpc)
-
+		log.Info("chainheight , currentHeight ", chainHeight, currentHeight)
 		if needSync {
 			if currentHeight < sideNode.SyncStartHeight {
 				currentHeight = sideNode.SyncStartHeight
@@ -245,6 +246,7 @@ func (monitor *SideChainAccountMonitorImpl) needSyncBlocks(genesisBlockAddress s
 
 	chainHeight, err := rpc.GetCurrentHeight(config)
 	if err != nil {
+		log.Error("GetCurrentHeight error ", err.Error())
 		return 0, 0, false
 	}
 
