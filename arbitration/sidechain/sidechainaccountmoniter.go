@@ -209,7 +209,11 @@ func (monitor *SideChainAccountMonitorImpl) SyncChainData(sideNode *config.SideN
 							log.Error("Invalid payload type need TransferCrossChainAsset")
 							continue
 						}
-						address := referTxn.Outputs[referIndex].ProgramHash.String()
+						address, err  := referTxn.Outputs[referIndex].ProgramHash.ToAddress()
+						if err != nil {
+							log.Error("program hash to address error" , err.Error())
+							continue
+						}
 						for i, cca := range payload.CrossChainAmounts {
 							idx := payload.OutputIndexes[i]
 							amount := originTx.Outputs[idx].Value
