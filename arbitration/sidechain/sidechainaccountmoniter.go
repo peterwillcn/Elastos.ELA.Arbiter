@@ -175,15 +175,24 @@ func (monitor *SideChainAccountMonitorImpl) SyncChainData(sideNode *config.SideN
 					log.Infof("respose data %v \n", fTxs)
 					var failedTxs []base.FailedDepositTx
 					for _, tx := range fTxs {
-						originTx, err := rpc.GetTransaction(tx, config.Parameters.MainNode.Rpc)
+						txnBytes, err := common.HexStringToBytes(tx)
+						if err != nil {
+							log.Warn("[MoniterFailedDepositTransfer] tx hash can not reversed")
+							continue
+						}
+						reversedTxnBytes := common.BytesReverse(txnBytes)
+						reversedTx := common.BytesToHexString(reversedTxnBytes)
+						log.Warn("reversedTx tx is ", reversedTx)
+						originTx, err := rpc.GetTransaction(reversedTx, config.Parameters.MainNode.Rpc)
 						if err != nil {
 							log.Errorf(err.Error())
 							continue
 						}
 						referTxid := originTx.Inputs[0].Previous.TxID
 						referIndex := originTx.Inputs[0].Previous.Index
-
-						referTxn, err := rpc.GetTransaction(referTxid.String(), config.Parameters.MainNode.Rpc)
+						referReversedTx := common.BytesToHexString(common.BytesReverse(referTxid.Bytes()))
+						log.Warn("referReversedTx tx is ", reversedTx)
+						referTxn, err := rpc.GetTransaction(referReversedTx, config.Parameters.MainNode.Rpc)
 						if err != nil {
 							log.Errorf(err.Error())
 							continue
