@@ -19,6 +19,8 @@ import (
 
 const sideChainHeightInterval uint32 = 1000
 
+var Initialized bool
+
 type SideChainAccountMonitorImpl struct {
 	mux sync.Mutex
 
@@ -79,6 +81,10 @@ func (monitor *SideChainAccountMonitorImpl) SyncChainData(sideNode *config.SideN
 	for {
 		time.Sleep(time.Millisecond * config.Parameters.SideChainMonitorScanInterval)
 
+		if !Initialized {
+			log.Info("Not initialized yet")
+			continue
+		}
 		log.Info("side chain SyncChainData ,", sideNode.SupportQuickRecharge, sideNode.Rpc.IpAddress, sideNode.Rpc.HttpJsonPort)
 		chainHeight, currentHeight, needSync := monitor.needSyncBlocks(sideNode.GenesisBlockAddress, sideNode.Rpc)
 		log.Info("chainheight , currentHeight ", chainHeight, currentHeight)
@@ -191,7 +197,7 @@ func (monitor *SideChainAccountMonitorImpl) SyncChainData(sideNode *config.SideN
 						referTxid := originTx.Inputs[0].Previous.TxID
 						referIndex := originTx.Inputs[0].Previous.Index
 						referReversedTx := common.BytesToHexString(common.BytesReverse(referTxid.Bytes()))
-						log.Warn("referReversedTx tx is ", reversedTx)
+						log.Warn("referReversedTx tx is ", referReversedTx)
 						referTxn, err := rpc.GetTransaction(referReversedTx, config.Parameters.MainNode.Rpc)
 						if err != nil {
 							log.Errorf(err.Error())

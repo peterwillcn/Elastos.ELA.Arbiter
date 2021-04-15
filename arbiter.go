@@ -176,5 +176,7 @@ func main() {
 	log.Info("10. Start small crosschain transfer monitor.")
 	go arbitrator.MoniterSmallCrossTransfer()
 
+	sidechain.Initialized = true
+
 	select {}
 }
