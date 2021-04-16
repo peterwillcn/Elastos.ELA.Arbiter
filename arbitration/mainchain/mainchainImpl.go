@@ -231,15 +231,11 @@ func (mc *MainChainImpl) CreateFailedDepositTransaction(
 	if err != nil {
 		return nil, err
 	}
-	log.Info("lllll111222")
-	// Create payload
-	chainHeight, err := mcFunc.GetMainNodeCurrentHeight()
-	if err != nil {
-		return nil, err
-	}
+
+	log.Info(" side chain height ", sideHeight)
 
 	txPayload := &payload.ReturnSideChainDepositCoin{
-		Height:              chainHeight,
+		Height:              sideHeight,
 		GenesisBlockAddress: withdrawBank,
 		DepositTxs:          txHashes,
 	}
