@@ -362,18 +362,26 @@ func checkIllegalDepositTxPayload(txn *types.Transaction,
 		if err != nil || !exist {
 			return errors.New("[checkIllegalDepositTxPayload] failed, unknown side chain transactions" + err.Error())
 		}
-
-		originTx, err := rpc.GetTransaction(tx.String(), config.Parameters.MainNode.Rpc)
+		txnBytes, err := common.HexStringToBytes(tx.String())
 		if err != nil {
-			log.Errorf(err.Error())
+			log.Warn("[checkIllegalDepositTxPayload] tx hash can not reversed")
+			continue
+		}
+		reversedTxnBytes := common.BytesReverse(txnBytes)
+		reversedTx := common.BytesToHexString(reversedTxnBytes)
+		log.Warn("[checkIllegalDepositTxPayload] reversedTx tx is ", reversedTx)
+		originTx, err := rpc.GetTransaction(reversedTx, config.Parameters.MainNode.Rpc)
+		if err != nil {
+			log.Errorf("originTx ", err.Error())
 			break
 		}
 		referTxid := originTx.Inputs[0].Previous.TxID
 		referIndex := originTx.Inputs[0].Previous.Index
-
-		referTxn, err := rpc.GetTransaction(referTxid.String(), config.Parameters.MainNode.Rpc)
+		referReversedTx := common.BytesToHexString(common.BytesReverse(referTxid.Bytes()))
+		log.Warn("referReversedTx tx is ", referReversedTx)
+		referTxn, err := rpc.GetTransaction(referReversedTx, config.Parameters.MainNode.Rpc)
 		if err != nil {
-			log.Errorf(err.Error())
+			log.Errorf("referReversedTx", err.Error())
 			break
 		}
 		originHash := originTx.Hash()
@@ -382,7 +390,11 @@ func checkIllegalDepositTxPayload(txn *types.Transaction,
 			log.Errorf("Invalid payload type need TransferCrossChainAsset")
 			break
 		}
-		address := referTxn.Outputs[referIndex].ProgramHash.String()
+		address, err := referTxn.Outputs[referIndex].ProgramHash.ToAddress()
+		if err != nil {
+			log.Error("ProgramHash can not transfer to address ", err.Error())
+			break
+		}
 		for i, cca := range payload.CrossChainAmounts {
 			idx := payload.OutputIndexes[i]
 			amount := originTx.Outputs[idx].Value
