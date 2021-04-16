@@ -186,12 +186,8 @@ func (sc *SideChainImpl) GetWithdrawTransaction(txHash string) (*base.WithdrawTx
 	return txInfo, nil
 }
 
-func (sc *SideChainImpl) GetIllegalDeositTransaction(txHash string) (bool, error) {
-	currHeight, err := sc.GetCurrentHeight()
-	if err != nil {
-		return false, err
-	}
-	exist, err := rpc.GetDepositTransactionInfoByHash(txHash, sc.CurrentConfig.Rpc, currHeight)
+func (sc *SideChainImpl) GetIllegalDeositTransaction(txHash string, height uint32) (bool, error) {
+	exist, err := rpc.GetDepositTransactionInfoByHash(txHash, sc.CurrentConfig.Rpc, height)
 	if err != nil {
 		return false, err
 	}
@@ -207,8 +203,8 @@ func (sc *SideChainImpl) CheckIllegalDepositTx(depositTxs []common.Uint256) (boo
 	return rpc.CheckIllegalDepositTx(depositTxs, sc.CurrentConfig.Rpc)
 }
 
-func (sc *SideChainImpl) SendFailedDepositTxs(tx []base.FailedDepositTx) error {
-	return sc.CreateAndBroadcastFailedDepositTxsProposal(tx)
+func (sc *SideChainImpl) SendFailedDepositTxs(tx []base.FailedDepositTx, sideHeight uint32) error {
+	return sc.CreateAndBroadcastFailedDepositTxsProposal(tx, sideHeight)
 }
 
 func (sc *SideChainImpl) SendCachedWithdrawTxs() {
@@ -306,7 +302,7 @@ func (sc *SideChainImpl) CreateAndBroadcastWithdrawProposal(txnHashes []string) 
 	return nil
 }
 
-func (sc *SideChainImpl) CreateAndBroadcastFailedDepositTxsProposal(failedTxs []base.FailedDepositTx) error {
+func (sc *SideChainImpl) CreateAndBroadcastFailedDepositTxsProposal(failedTxs []base.FailedDepositTx, sideHeight uint32) error {
 
 	if len(failedTxs) == 0 {
 		return nil
@@ -332,7 +328,7 @@ func (sc *SideChainImpl) CreateAndBroadcastFailedDepositTxsProposal(failedTxs []
 		}
 
 		tx := currentArbitrator.CreateFailedDepositTransaction(
-			targetTransactions[:targetIndex], sc, &arbitrator.MainChainFuncImpl{})
+			targetTransactions[:targetIndex], sc, &arbitrator.MainChainFuncImpl{}, sideHeight)
 		log.Info("sdfasdasdfaf")
 		if tx == nil {
 			continue

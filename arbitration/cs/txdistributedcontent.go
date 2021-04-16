@@ -357,9 +357,10 @@ func checkIllegalDepositTxPayload(txn *types.Transaction,
 	log.Info("[checkIllegalDepositTxPayload], need to get side chain transaction from rpc")
 	var failedTxs []*base.FailedDepositTx
 	for _, tx := range payloadIllegalDeposit.DepositTxs {
-		exist, err := sideChain.GetIllegalDeositTransaction(tx.String())
+		log.Info()
+		exist, err := sideChain.GetIllegalDeositTransaction(tx.String(), payloadIllegalDeposit.Height)
 		if err != nil || !exist {
-			return errors.New("[checkIllegalDepositTxPayload] failed, unknown side chain transactions")
+			return errors.New("[checkIllegalDepositTxPayload] failed, unknown side chain transactions" + err.Error())
 		}
 
 		originTx, err := rpc.GetTransaction(tx.String(), config.Parameters.MainNode.Rpc)

@@ -52,7 +52,7 @@ type Arbitrator interface {
 		sideChain SideChain, mcFunc MainChainFunc) *types.Transaction
 	//failed deposit
 	CreateFailedDepositTransaction(withdrawTxs []*FailedDepositTx,
-		sideChain SideChain, mcFunc MainChainFunc) *types.Transaction
+		sideChain SideChain, mcFunc MainChainFunc, sideHeight uint32) *types.Transaction
 
 	BroadcastWithdrawProposal(txn *types.Transaction)
 	SendWithdrawTransaction(txn *types.Transaction) (rpc.Response, error)
@@ -136,10 +136,10 @@ func (ar *ArbitratorImpl) GetArbitratorGroup() ArbitratorGroup {
 }
 
 func (ar *ArbitratorImpl) CreateFailedDepositTransaction(withdrawTxs []*FailedDepositTx,
-	sideChain SideChain, mcFunc MainChainFunc) *types.Transaction {
+	sideChain SideChain, mcFunc MainChainFunc, sideHeight uint32) *types.Transaction {
 	log.Info("1211111")
 	ftx, err := ar.mainChainImpl.CreateFailedDepositTransaction(
-		sideChain, withdrawTxs, mcFunc)
+		sideChain, withdrawTxs, mcFunc, sideHeight)
 	if err != nil {
 		log.Warn(err.Error(), 12324)
 		return nil

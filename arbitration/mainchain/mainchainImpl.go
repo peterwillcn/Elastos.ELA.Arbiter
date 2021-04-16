@@ -152,7 +152,7 @@ func parseUserFailedDepositTransactions(txs []*base.FailedDepositTx, fee common.
 
 func (mc *MainChainImpl) CreateFailedDepositTransaction(
 	sideChain arbitrator.SideChain, failedDepositTxs []*base.FailedDepositTx,
-	mcFunc arbitrator.MainChainFunc) (*types.Transaction, error) {
+	mcFunc arbitrator.MainChainFunc, sideHeight uint32) (*types.Transaction, error) {
 
 	withdrawBank := sideChain.GetKey()
 	log.Info("withdrawBank address", withdrawBank)

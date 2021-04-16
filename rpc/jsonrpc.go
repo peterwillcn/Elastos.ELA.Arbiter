@@ -284,7 +284,7 @@ func GetDepositTransactionInfoByHash(transactionHash string, config *config.RpcC
 	}
 	reversedHashBytes := common.BytesReverse(hashBytes)
 	reversedHashStr := common.BytesToHexString(reversedHashBytes)
-
+	log.Info("GetDepositTransactionInfoByHash reversedHashStr ", reversedHashStr, " height ", height)
 	result, err := CallAndUnmarshal("getfaileddeposittransactions", Param("height", height), config)
 	if err != nil {
 		return false, err
@@ -294,6 +294,7 @@ func GetDepositTransactionInfoByHash(transactionHash string, config *config.RpcC
 	if err := Unmarshal(&result, &fTxs); err != nil {
 		return false, errors.New("[MoniterFailedDepositTransfer] Unmarshal getfaileddeposittransactions responce error")
 	}
+	log.Infof("Result %v", fTxs)
 	for _, tx := range fTxs {
 		if tx == reversedHashStr {
 			return true, nil

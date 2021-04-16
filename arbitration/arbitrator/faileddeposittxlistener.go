@@ -131,11 +131,11 @@ func MoniterFailedDepositTransfer() {
 						break
 					}
 					log.Info("111")
-					err = curr.SendFailedDepositTxs(failedTxs)
-					if err != nil {
-						log.Error("[MoniterFailedDepositTransfer] CreateAndBroadcastWithdrawProposal failed", err.Error())
-						break
-					}
+					//err = curr.SendFailedDepositTxs(failedTxs)
+					//if err != nil {
+					//	log.Error("[MoniterFailedDepositTransfer] CreateAndBroadcastWithdrawProposal failed", err.Error())
+					//	break
+					//}
 				}
 			}
 			log.Info("End Monitor Failed Deposit Transfer")

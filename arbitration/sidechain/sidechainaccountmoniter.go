@@ -209,9 +209,9 @@ func (monitor *SideChainAccountMonitorImpl) SyncChainData(sideNode *config.SideN
 							log.Error("Invalid payload type need TransferCrossChainAsset")
 							continue
 						}
-						address, err  := referTxn.Outputs[referIndex].ProgramHash.ToAddress()
+						address, err := referTxn.Outputs[referIndex].ProgramHash.ToAddress()
 						if err != nil {
-							log.Error("program hash to address error" , err.Error())
+							log.Error("program hash to address error", err.Error())
 							continue
 						}
 						for i, cca := range payload.CrossChainAmounts {
@@ -237,7 +237,7 @@ func (monitor *SideChainAccountMonitorImpl) SyncChainData(sideNode *config.SideN
 						continue
 					}
 					log.Info("111")
-					err = curr.SendFailedDepositTxs(failedTxs)
+					err = curr.SendFailedDepositTxs(failedTxs, currentHeight)
 					if err != nil {
 						log.Error("[MoniterFailedDepositTransfer] CreateAndBroadcastWithdrawProposal failed", err.Error())
 						continue
