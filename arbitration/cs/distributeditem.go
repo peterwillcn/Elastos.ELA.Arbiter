@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/hex"
 	"errors"
+	"github.com/elastos/Elastos.ELA.Arbiter/config"
 	"github.com/elastos/Elastos.ELA.Arbiter/log"
 	"io"
 
@@ -287,12 +288,30 @@ func (item *DistributedItem) appendSignature(signerIndex int, signature []byte, 
 		sign := signedData[1:]
 		targetPk := item.TargetArbitratorPublicKey
 
-		blockHeight, err := item.ItemContent.CurrentBlockHeight()
+		//blockHeight, err := item.ItemContent.CurrentBlockHeight()
+		//if err != nil {
+		//	return err
+		//}
+		//groupInfo, err := itemFunc.GetArbitratorGroupInfoByHeight(blockHeight)
+		//if err != nil {
+		//	return err
+		//}
+		//
+		//onDutyArbitratorPk, err :=
+		//	base.PublicKeyFromString(groupInfo.Arbitrators[groupInfo.OnDutyArbitratorIndex])
+		//if err != nil {
+		//	return err
+		//}
+
+		height, err := rpc.GetCurrentHeight(config.Parameters.MainNode.Rpc)
 		if err != nil {
+			log.Info("[appendSignature] rpc get current height failed")
 			return err
 		}
-		groupInfo, err := itemFunc.GetArbitratorGroupInfoByHeight(blockHeight)
+
+		groupInfo, err := rpc.GetArbitratorGroupInfoByHeight(height)
 		if err != nil {
+			log.Info("[appendSignature] get arbitrator group info failed")
 			return err
 		}
 
