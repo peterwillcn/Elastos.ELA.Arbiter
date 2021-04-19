@@ -164,7 +164,6 @@ func (monitor *SideChainAccountMonitorImpl) SyncChainData(sideNode *config.SideN
 				// Start handle failed deposit transaction
 				log.Info("Start Monitor Failed Deposit Transfer current height ", currentHeight)
 				if sideNode.SupportQuickRecharge {
-					log.Info("11")
 					param := make(map[string]interface{})
 					param["height"] = currentHeight
 					resp, err := rpc.CallAndUnmarshal("getfaileddeposittransactions", param,
@@ -188,7 +187,6 @@ func (monitor *SideChainAccountMonitorImpl) SyncChainData(sideNode *config.SideN
 						}
 						reversedTxnBytes := common.BytesReverse(txnBytes)
 						reversedTx := common.BytesToHexString(reversedTxnBytes)
-						log.Warn("reversedTx tx is ", reversedTx)
 						originTx, err := rpc.GetTransaction(reversedTx, config.Parameters.MainNode.Rpc)
 						if err != nil {
 							log.Errorf(err.Error())
@@ -197,7 +195,6 @@ func (monitor *SideChainAccountMonitorImpl) SyncChainData(sideNode *config.SideN
 						referTxid := originTx.Inputs[0].Previous.TxID
 						referIndex := originTx.Inputs[0].Previous.Index
 						referReversedTx := common.BytesToHexString(common.BytesReverse(referTxid.Bytes()))
-						log.Warn("referReversedTx tx is ", referReversedTx)
 						referTxn, err := rpc.GetTransaction(referReversedTx, config.Parameters.MainNode.Rpc)
 						if err != nil {
 							log.Errorf(err.Error())
@@ -236,7 +233,6 @@ func (monitor *SideChainAccountMonitorImpl) SyncChainData(sideNode *config.SideN
 						log.Warn("[MoniterFailedDepositTransfer] i am not onduty")
 						continue
 					}
-					log.Info("111")
 					err = curr.SendFailedDepositTxs(failedTxs, currentHeight)
 					if err != nil {
 						log.Error("[MoniterFailedDepositTransfer] CreateAndBroadcastWithdrawProposal failed", err.Error())

@@ -342,7 +342,6 @@ func checkIllegalDepositTxPayload(txn *types.Transaction,
 	if err != nil {
 		return err
 	}
-	log.Info("txn ,", txn.String())
 	var transactionHashes []string
 	for _, hash := range payloadIllegalDeposit.DepositTxs {
 		transactionHashes = append(transactionHashes, hash.String())
@@ -369,7 +368,6 @@ func checkIllegalDepositTxPayload(txn *types.Transaction,
 		}
 		reversedTxnBytes := common.BytesReverse(txnBytes)
 		reversedTx := common.BytesToHexString(reversedTxnBytes)
-		log.Warn("[checkIllegalDepositTxPayload] reversedTx tx is ", reversedTx)
 		originTx, err := rpc.GetTransaction(reversedTx, config.Parameters.MainNode.Rpc)
 		if err != nil {
 			log.Errorf("originTx ", err.Error())
@@ -378,7 +376,6 @@ func checkIllegalDepositTxPayload(txn *types.Transaction,
 		referTxid := originTx.Inputs[0].Previous.TxID
 		referIndex := originTx.Inputs[0].Previous.Index
 		referReversedTx := common.BytesToHexString(common.BytesReverse(referTxid.Bytes()))
-		log.Warn("referReversedTx tx is ", referReversedTx)
 		referTxn, err := rpc.GetTransaction(referReversedTx, config.Parameters.MainNode.Rpc)
 		if err != nil {
 			log.Errorf("referReversedTx", err.Error())
@@ -422,7 +419,6 @@ func checkIllegalDepositTxPayload(txn *types.Transaction,
 				},
 			},
 		}
-		log.Info(1)
 		txID, _ := common.Uint256FromHexString(tx.TxID)
 		var depositAssets []*base.DepositAssets
 		for _, cs := range tx.CrossChainAssets {
@@ -440,7 +436,6 @@ func checkIllegalDepositTxPayload(txn *types.Transaction,
 				CrossChainAmount: csAmount,
 			})
 		}
-		log.Info(2)
 		txs = append(txs, &base.FailedDepositTx{
 			Txid: txID,
 			DepositInfo: &base.DepositInfo{
@@ -448,54 +443,10 @@ func checkIllegalDepositTxPayload(txn *types.Transaction,
 			},
 		})
 	}
-	//for _, txHash := range payloadIllegalDeposit.DepositTxs {
-	//
-	//	log.Info("[checkIllegalDepositTxPayload] , txHash  , key ", txHash, sideChain.GetKey())
-	//	tx := &base.DepositTxsInfo{
-	//		TxID: "de5a9ce6542a7ff603c6cbe38b31f7115b8e3e0a6d76da16630f13c27154ac3d",
-	//		CrossChainAssets: []*base.DepositOutputInfo{
-	//			{
-	//				CrossChainAddress: "EWY9yB7kreywqjesdaU52eSnbRDBNEDCTy",
-	//				CrossChainAmount:  "10.0",
-	//				OutputAmount:      "10.00001000",
-	//			},
-	//		},
-	//	}
-	//	log.Info(1)
-	//	txID, _ := common.Uint256FromHexString(tx.TxID)
-	//	var depositAssets []*base.DepositAssets
-	//	for _, cs := range tx.CrossChainAssets {
-	//		csAmount, err := common.StringToFixed64(cs.CrossChainAmount)
-	//		if err != nil {
-	//			return errors.New("[checkIllegalDepositTxPayload] invalid cross chain amount in tx")
-	//		}
-	//		opAmount, err := common.StringToFixed64(cs.OutputAmount)
-	//		if err != nil {
-	//			return errors.New("[checkIllegalDepositTxPayload] invalid output amount in tx")
-	//		}
-	//		depositAssets = append(depositAssets, &base.DepositAssets{
-	//			TargetAddress:    cs.CrossChainAddress,
-	//			Amount:           opAmount,
-	//			CrossChainAmount: csAmount,
-	//		})
-	//	}
-	//	log.Info(2)
-	//	txs = append(txs, &base.FailedDepositTx{
-	//		Txid: txID,
-	//		DepositInfo: &base.DepositInfo{
-	//			DepositAssets: depositAssets,
-	//		},
-	//	})
-	//}
-	//} else {
-	//	txs = sideChainTxs
-	//}
-	log.Info(3)
 	inputTotalAmount, err := mainFunc.GetAmountByInputs(txn.Inputs)
 	if err != nil {
 		return errors.New("get spender's UTXOs failed")
 	}
-	log.Info(4)
 	// check outputs and fee.
 	var outputTotalAmount common.Fixed64
 	withdrawOutputsMap := make(map[string]common.Fixed64)
@@ -516,7 +467,6 @@ func checkIllegalDepositTxPayload(txn *types.Transaction,
 			withdrawOutputsMap[addr] = output.Value
 		}
 	}
-	log.Info(5)
 	var totalFee common.Fixed64
 	var oriOutputAmount common.Fixed64
 	var totalCrossChainAmount int
@@ -541,14 +491,12 @@ func checkIllegalDepositTxPayload(txn *types.Transaction,
 		}
 		totalCrossChainAmount += len(tx.DepositInfo.DepositAssets)
 	}
-	log.Info(6)
 	if inputTotalAmount != outputTotalAmount+totalFee {
 		log.Info("inputTotalAmount-", inputTotalAmount,
 			" outputTotalAmount-", outputTotalAmount, " totalFee-", totalFee)
 		return errors.New("check withdraw transaction failed, input " +
 			"amount not equal output amount")
 	}
-	log.Info(7)
 	// check exchange rate.
 	genesisBlockProgramHash, err := common.Uint168FromAddress(payloadIllegalDeposit.GenesisBlockAddress)
 	if err != nil {
@@ -563,13 +511,11 @@ func checkIllegalDepositTxPayload(txn *types.Transaction,
 			totalWithdrawAmount++
 		}
 	}
-	log.Info(8)
 	if totalCrossChainAmount != totalWithdrawAmount ||
 		len(crossChainOutputsMap) != len(withdrawOutputsMap) {
 		return errors.New("check withdraw transaction failed, cross chain " +
 			"amount not equal withdraw total amount")
 	}
-	log.Info(9)
 	for k, v := range withdrawOutputsMap {
 		amount, ok := crossChainOutputsMap[k]
 		if !ok || common.Fixed64(float64(amount)/exchangeRate) != v {
@@ -578,12 +524,10 @@ func checkIllegalDepositTxPayload(txn *types.Transaction,
 				v.String(), amount.String())
 		}
 	}
-	log.Info(10)
 	if oriOutputAmount != withdrawOutputAmount {
 		log.Info("oriOutputAmount-", oriOutputAmount, " withdrawOutputAmount-", withdrawOutputAmount)
 		return errors.New("check withdraw transaction failed, exchange rate verify failed")
 	}
-	log.Info(11)
 	log.Info("[checkIllegalDepositTxPayload] success")
 	return nil
 }

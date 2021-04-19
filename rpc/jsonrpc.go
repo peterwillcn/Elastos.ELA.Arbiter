@@ -283,7 +283,7 @@ func GetDepositTransactionInfoByHash(transactionHash string, config *config.RpcC
 		return false, err
 	}
 	hashStr := common.BytesToHexString(hashBytes)
-	log.Info("GetDepositTransactionInfoByHash reversedHashStr ", hashStr, " height ", height)
+	log.Info("GetDepositTransactionInfoByHash hashStr ", hashStr, " height ", height)
 	result, err := CallAndUnmarshal("getfaileddeposittransactions", Param("height", height), config)
 	if err != nil {
 		return false, err

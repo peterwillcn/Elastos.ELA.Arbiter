@@ -117,8 +117,6 @@ func parseUserWithdrawTransactions(txs []*base.WithdrawTx) (
 
 func parseUserFailedDepositTransactions(txs []*base.FailedDepositTx, fee common.Fixed64) (
 	*base.DepositInfo, []common.Uint256) {
-
-	log.Info("Tx targetaddress 1111 ", txs[0].DepositInfo.DepositAssets[0].TargetAddress)
 	result := new(base.DepositInfo)
 	var sideChainTxHashes []common.Uint256
 	for _, tx := range txs {
@@ -127,26 +125,6 @@ func parseUserFailedDepositTransactions(txs []*base.FailedDepositTx, fee common.
 		}
 		sideChainTxHashes = append(sideChainTxHashes, *tx.Txid)
 	}
-
-	//existAsset := make(map[string]base.DepositAssets, 0)
-	//for _, asset := range result.DepositAssets {
-	//	if a, ok := existAsset[asset.TargetAddress]; ok {
-	//		newAmt := *a.Amount + *asset.Amount + fee
-	//		newCrsAmt := *a.CrossChainAmount + *asset.CrossChainAmount
-	//		existAsset[asset.TargetAddress] = base.DepositAssets{
-	//			TargetAddress:    a.TargetAddress,
-	//			Amount:           &newAmt,
-	//			CrossChainAmount: &newCrsAmt,
-	//		}
-	//	} else {
-	//		existAsset[asset.TargetAddress] = *asset
-	//	}
-	//}
-	//returnResult := new(base.DepositInfo)
-	//for _, v := range existAsset {
-	//	returnResult.DepositAssets = append(returnResult.DepositAssets, &v)
-	//}
-	log.Info("Tx targetaddress 222 ", result.DepositAssets[0].TargetAddress, sideChainTxHashes)
 	return result, sideChainTxHashes
 }
 
@@ -155,7 +133,6 @@ func (mc *MainChainImpl) CreateFailedDepositTransaction(
 	mcFunc arbitrator.MainChainFunc, sideHeight uint32) (*types.Transaction, error) {
 
 	withdrawBank := sideChain.GetKey()
-	log.Info("withdrawBank address", withdrawBank)
 	exchangeRate, err := sideChain.GetExchangeRate()
 	if err != nil {
 		return nil, err
@@ -167,10 +144,8 @@ func (mc *MainChainImpl) CreateFailedDepositTransaction(
 	// Check if from address is valid
 	assetID := base.SystemAssetId
 	withdrawInfo, txHashes := parseUserFailedDepositTransactions(failedDepositTxs, config.Parameters.ReturnDepositTransactionFee)
-	log.Info("withdrawInfo :", len(withdrawInfo.DepositAssets))
 
 	for _, withdraw := range withdrawInfo.DepositAssets {
-		log.Info(333, withdraw.TargetAddress, withdraw.Amount, withdraw.CrossChainAmount)
 		programhash, err := common.Uint168FromAddress(withdraw.TargetAddress)
 		if err != nil {
 			return nil, err
@@ -202,10 +177,8 @@ func (mc *MainChainImpl) CreateFailedDepositTransaction(
 			totalOutputAmount = 0
 			break
 		} else if *utxo.Amount > totalOutputAmount {
-			log.Info("here", withdrawBank)
 			programHash, err := common.Uint168FromAddress(withdrawBank)
 			if err != nil {
-				log.Info("here")
 				return nil, err
 			}
 			change := &types.Output{
@@ -221,7 +194,6 @@ func (mc *MainChainImpl) CreateFailedDepositTransaction(
 			break
 		}
 	}
-	log.Info("lllll111")
 	if totalOutputAmount > 0 {
 		return nil, errors.New("available token is not enough")
 	}
@@ -232,8 +204,6 @@ func (mc *MainChainImpl) CreateFailedDepositTransaction(
 		return nil, err
 	}
 
-	log.Info(" side chain height ", sideHeight)
-
 	txPayload := &payload.ReturnSideChainDepositCoin{
 		Height:              sideHeight,
 		GenesisBlockAddress: withdrawBank,
@@ -242,7 +212,6 @@ func (mc *MainChainImpl) CreateFailedDepositTransaction(
 
 	p := &program.Program{redeemScript, nil}
 
-	log.Info("lllll")
 	return &types.Transaction{
 		Version:    types.TxVersion09,
 		TxType:     types.ReturnSideChainDepositCoin,
