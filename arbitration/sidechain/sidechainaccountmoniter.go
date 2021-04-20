@@ -216,6 +216,7 @@ func (monitor *SideChainAccountMonitorImpl) SyncChainData(sideNode *config.SideN
 							amount := originTx.Outputs[idx].Value
 							returnAmt := amount - config.Parameters.ReturnDepositTransactionFee
 							ccaAmt := cca - config.Parameters.ReturnDepositTransactionFee
+							log.Info("returnAmt ccaAmt ",returnAmt,ccaAmt)
 							failedTxs = append(failedTxs, base.FailedDepositTx{
 								Txid: &originHash,
 								DepositInfo: &base.DepositInfo{
