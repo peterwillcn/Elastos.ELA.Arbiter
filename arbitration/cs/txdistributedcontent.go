@@ -444,6 +444,7 @@ func checkIllegalDepositTxPayload(txn *types.Transaction,
 			},
 		})
 	}
+	log.Info("txn %v", txn)
 	inputTotalAmount, err := mainFunc.GetAmountByInputs(txn.Inputs)
 	if err != nil {
 		return errors.New("get spender's UTXOs failed")

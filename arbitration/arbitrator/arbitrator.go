@@ -143,6 +143,7 @@ func (ar *ArbitratorImpl) CreateFailedDepositTransaction(withdrawTxs []*FailedDe
 		log.Warn(err.Error())
 		return nil
 	}
+	log.Info("ftx %v", ftx)
 	if ftx == nil {
 		log.Warn("Created an empty withdraw transaction.")
 		return nil

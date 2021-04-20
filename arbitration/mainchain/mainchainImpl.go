@@ -161,6 +161,7 @@ func (mc *MainChainImpl) CreateFailedDepositTransaction(
 		txOutputs = append(txOutputs, txOutput)
 		totalOutputAmount += common.Fixed64(float64(*withdraw.Amount) / exchangeRate)
 	}
+	log.Info("totalOutputAmount ", totalOutputAmount)
 
 	availableUTXOs, err := mcFunc.GetWithdrawUTXOsByAmount(withdrawBank, totalOutputAmount)
 	if err != nil {
