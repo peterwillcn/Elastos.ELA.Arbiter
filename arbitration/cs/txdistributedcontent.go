@@ -410,15 +410,15 @@ func checkReturnDepositTxPayload(txn *types.Transaction, clientFunc DistributedN
 		if !ok {
 			return errors.New("[checkReturnDepositTxPayload], invalid output payload")
 		}
-		sideChain, _, err := clientFunc.GetSideChainAndExchangeRate(opl.GenesisBlockAddress)
+		_, _, err := clientFunc.GetSideChainAndExchangeRate(opl.GenesisBlockAddress)
 		if err != nil {
 			return err
 		}
-
-		exist, err := sideChain.GetFailedDepositTransaction(opl.DepositTransactionHash.String())
-		if err != nil || !exist {
-			return errors.New("[checkReturnDepositTxPayload] failed, unknown side chain transactions")
-		}
+		//
+		//exist, err := sideChain.GetFailedDepositTransaction(opl.DepositTransactionHash.String())
+		//if err != nil || !exist {
+		//	return errors.New("[checkReturnDepositTxPayload] failed, unknown side chain transactions")
+		//}
 		txnBytes, err := common.HexStringToBytes(opl.DepositTransactionHash.String())
 		if err != nil {
 			return errors.New("[checkReturnDepositTxPayload] tx hash can not reversed")
