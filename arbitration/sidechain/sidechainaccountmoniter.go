@@ -279,15 +279,15 @@ func (monitor *SideChainAccountMonitorImpl) SyncChainData(sideNode *config.SideN
 					}
 					log.Infof(" failed tx before sending %v", failedTxs)
 
-					if !arbitrator.ArbitratorGroupSingleton.GetCurrentArbitrator().IsOnDutyOfMain() {
-						log.Warn("[MoniterFailedDepositTransfer] i am not onduty")
-						continue
-					}
-					err = curr.SendFailedDepositTxs(failedTxs)
-					if err != nil {
-						log.Error("[MoniterFailedDepositTransfer] CreateAndBroadcastWithdrawProposal failed", err.Error())
-						continue
-					}
+					// if !arbitrator.ArbitratorGroupSingleton.GetCurrentArbitrator().IsOnDutyOfMain() {
+					// 	log.Warn("[MoniterFailedDepositTransfer] i am not onduty")
+					// 	continue
+					// }
+					// err = curr.SendFailedDepositTxs(failedTxs)
+					// if err != nil {
+					// 	log.Error("[MoniterFailedDepositTransfer] CreateAndBroadcastWithdrawProposal failed", err.Error())
+					// 	continue
+					// }
 				}
 				log.Info("End Monitor Failed Deposit Transfer")
 			}
