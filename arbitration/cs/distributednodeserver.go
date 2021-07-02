@@ -191,9 +191,7 @@ func (dns *DistributedNodeServer) ReceiveProposalFeedback(content []byte) error 
 		dns.mux.Unlock()
 		return errors.New("can not find proposal")
 	}
-	hash := transactionItem.ItemContent.Hash()
-	log.Info("Receiving content hash ", hash.String())
-	txn, ok := dns.unsolvedContents[hash]
+	txn, ok := dns.unsolvedContents[transactionItem.ItemContent.Hash()]
 	if !ok {
 		dns.mux.Unlock()
 		return errors.New("can not find proposal")
@@ -209,7 +207,7 @@ func (dns *DistributedNodeServer) ReceiveProposalFeedback(content []byte) error 
 	if signedCount >= getTransactionAgreementArbitratorsCount(
 		len(arbitrator.ArbitratorGroupSingleton.GetAllArbitrators())) {
 		dns.mux.Lock()
-		delete(dns.unsolvedContents, hash)
+		delete(dns.unsolvedContents, txn.Hash())
 		dns.mux.Unlock()
 
 		if err = txn.Submit(); err != nil {
