@@ -3,12 +3,13 @@ package arbitrator
 import (
 	"bytes"
 	"encoding/hex"
+	"time"
+
 	"github.com/elastos/Elastos.ELA.Arbiter/arbitration/base"
 	"github.com/elastos/Elastos.ELA.Arbiter/config"
 	"github.com/elastos/Elastos.ELA.Arbiter/log"
 	"github.com/elastos/Elastos.ELA.Arbiter/rpc"
 	"github.com/elastos/Elastos.ELA/core/types"
-	"time"
 )
 
 func MoniterSmallCrossTransfer() {
@@ -95,7 +96,6 @@ func MoniterSmallCrossTransfer() {
 				}
 				ArbitratorGroupSingleton.GetCurrentArbitrator().SendSmallCrossDepositTransactions(knownTxs, xAddr)
 			}
-			log.Info("End Monitor Small Cross Transfer")
 		}
 	}
 
